@@ -53,6 +53,11 @@ class Reward():
 
         return reward, distance
 
+    def reward_distance(self, dis2target_now):
+        reward = (self.dis2target_last - dis2target_now) / max(self.dis2target_last, 100)
+        self.dis2target_last = dis2target_now
+        return reward
+
     def reward_mask_height(self, pose,  height_landing, slope, roughness, done_thr, success_thr,
                            factor=100,
                            right_shift_one=1,
@@ -64,16 +69,17 @@ class Reward():
         done    = False
         success = False
         reward  = 0
-        reward_fov, fov_score = self.reward_mask(pose, slope, roughness, factor, right_shift_one, right_shift_two, stretch_one, stretch_two)
+        #reward_fov, mask_score = self.reward_mask(pose, slope, roughness, factor, right_shift_one, right_shift_two, stretch_one, stretch_two)
         reward_height, distance = self.reward_height(height_landing, pose, scale, stretch)
         reward_distance = self.reward_distance(distance)
 
-        reward = reward_fov + reward_height
+        reward = reward_fov + reward_height #+ reward_distance
 
         # Adding a step reward readded
-        if pose[2] < done_thr:
+        if distance < done_thr:
             done = True
-            if fov_score > success_thr:
+            mask_score = 0.9 # delete when using roughness and slope
+            if mask_score > success_thr:
                 reward += 500
                 log.warn("SUCCESS")
                 success = True
@@ -117,11 +123,6 @@ class Reward():
 
     def reward_depth(self, depth):
         pass
-
-    def reward_distance(self, dis2target_now):
-        reward = (self.dis2target_last - dis2target_now) / max(self.dis2target_last, 100)
-        self.dis2target_last = dis2target_now
-        return reward
 
     def reward_bbox(self, boxes):
         reward = 0

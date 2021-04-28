@@ -23,6 +23,7 @@ num_steps        = 20
 mini_batch_size  = 5
 ppo_epochs       = 4
 max_frames       = 15000
+threshold_reward = -200
 
 '''---------------------------------------------------------------'''
 
@@ -90,8 +91,8 @@ log.setLevel("WARN")
 
 
 # Copy settings file to data folder
-abs_path = os.path.dirname(real_lsd.__file__) + '/envs/settings/landing/cpptest.json'
-cp_path  = '/home/plr/old_project/data' # DATAPATH TODO
+abs_path = os.path.dirname(real_lsd.__file__) + '/envs/settings/landing/gorner.json'
+cp_path  = '/home/nicloi/plr_project/data' # DATAPATH TODO
 list_files = subprocess.run(["cp", abs_path, cp_path])
 log.warn("The exit code was: %d" % list_files.returncode)
 
@@ -102,7 +103,8 @@ device = torch.device("cuda" if use_cuda else "cpu")
 
 
 # Initialising environment
-env = gym.make('MyUnrealLand-cpptestFloorGood-DiscreteHeightFeatures-v0')
+#env = gym.make('MyUnrealLand-cpptestFloorGood-DiscreteHeightFeatures-v0')
+env = gym.make('MyUnrealLand-gornerFloorGood-DiscreteHeightFeatures-v0')
 num_inputs  = env.observation_space.shape[0]
 num_outputs = env.action_space.n
 log.info("Observation Space:", env.observation_space, "dimension of observation:", env.observation_space.shape[0])
@@ -157,6 +159,12 @@ state = env.reset()
 
 # Training loop
 while frame_idx < max_frames and not early_stop:
+    log.warn("Frame: {}".format(frame_idx))
+    log.warn("Frame: {}".format(frame_idx))
+    log.warn("Frame: {}".format(frame_idx))
+    log.warn("Frame: {}".format(frame_idx))
+    log.warn("Frame: {}".format(frame_idx))
+    log.warn("Frame: {}".format(frame_idx))
     log.warn("Frame: {}".format(frame_idx))
     log_probs = []
     values    = []

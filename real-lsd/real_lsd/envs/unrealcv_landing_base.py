@@ -50,9 +50,11 @@ class UnrealCvLanding_base(gym.Env):
         self.target_object         = setting['target_object']
         self.discrete_actions      = setting['discrete_actions']
         self.continous_actions     = setting['continous_actions']
-        self.points                = setting['points']
-        self.slope                 = setting['slope']
-        self.roughness             = setting['roughness']
+        self.points                = np.asarray(setting['points'][:,0:3])
+        self.slope                 = np.asarray(setting['points'][:,3])
+        self.roughness             = np.asarray(setting['points'][:,4])
+        log.warn("Points in the mesh: {}".format(self.points.shape))
+        
 
         self.docker                = docker
         self.reset_type            = reset_type                                 # Not Sure about reset_type
@@ -91,6 +93,7 @@ class UnrealCvLanding_base(gym.Env):
         # define reward type
         self.reward_type            = reward_type
         self.reward_function        = reward.Reward(setting)
+        log.warn("MAX STEPS: {}".format(self.maxsteps))
 
         # set start position
         self.trigger_count          = 0
@@ -105,8 +108,11 @@ class UnrealCvLanding_base(gym.Env):
         log.info("Initialized with RESET TYPE: {}".format(reset_type))
         self.reset_module           = reset_point.ResetPoint(setting, reset_type, current_pose)
 
-    def nearest_point(self, x, y)
-        aa
+    def nearest_point_idx(self, x, y)
+        point = np.array([x,y)]
+        deltas = self.points[:,0:2] - point 
+        dist_2 = np.einsum('ij,ij->i', deltas, deltas) 
+        return np.argmin(dist_2)
 
     def _step(self, action ):
         info = dict(
@@ -193,8 +199,9 @@ class UnrealCvLanding_base(gym.Env):
 
         # obtain nearest point and its features
         pose = info['Pose']
-        idx = self.nearest_point(pose[0], pose[1])
-        height_landing = self.points[2]
+        idx = self.nearest_point_idx(pose[0], pose[1])
+        log.warn("Current x,y: {}, nearest point x,y: {}".format((pose[0],pose[1]), (self.points[idx,0],self.points[idx,1]))
+        height_landing = self.points[idx,2]
         slope = self.slope[idx]
         roughness = self.roughness[idx]
         

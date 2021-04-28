@@ -30,3 +30,28 @@ for env in ['cpptest']:
                         max_episode_steps=200
                     )
                     log.info('Registered env: '+ 'MyUnrealLand-{env}{category}-{action}{obs}-v{reset}'.format(env=env, category=category, action=action, obs=obs, reset=i))
+
+
+# gorner
+
+env = gorner
+action ='Discrete'
+obs = 'HeightFeatures'
+category = settings['targets']["FloorGood"]:
+for i, reset in enumerate(['random']):
+
+	            register(
+	                id='MyUnrealLand-{env}{category}-{action}{obs}-v{reset}'.format(env=env, category=category, action=action, obs=obs, reset=i),
+	                entry_point='real_lsd.envs:UnrealCvLanding_base',
+	                kwargs={'setting_file': 'landing/{env}.json'.format(env=env),
+	                        'category': category,
+	                        'reset_type': reset,
+	                        'action_type': action,
+	                        'observation_type': obs,
+	                        'reward_type': 'mask',  # mask, bbox, distance, bbox_distance
+	                        'docker': use_docker,
+	                        },
+	                max_episode_steps=200
+	            )
+	            log.info('Registered env: '+ 'MyUnrealLand-{env}{category}-{action}{obs}-v{reset}'.format(env=env, category=category, action=action, obs=obs, reset=i))
+
