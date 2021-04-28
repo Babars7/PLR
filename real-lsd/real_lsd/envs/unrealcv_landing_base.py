@@ -109,7 +109,7 @@ class UnrealCvLanding_base(gym.Env):
         self.reset_module           = reset_point.ResetPoint(setting, reset_type, current_pose)
 
     def nearest_point_idx(self, x, y):
-        point = np.array([x,y)]
+        point = np.array([x,y])
         deltas = self.points[:,0:2] - point 
         dist_2 = np.einsum('ij,ij->i', deltas, deltas) 
         return np.argmin(dist_2)
