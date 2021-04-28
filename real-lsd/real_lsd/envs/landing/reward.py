@@ -8,8 +8,6 @@ class Reward():
     def __init__(self, setting):
         self.reward_factor = setting['reward_factor']
         self.reward_th = setting['reward_th']
-        self.slope = setting['slope']
-        self.roughness = setting['roughness']
         self.dis2target_last = 0
 
     # IN: object mask delivered by unrealcv client, mask, and pose
