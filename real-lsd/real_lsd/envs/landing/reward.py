@@ -8,44 +8,52 @@ class Reward():
     def __init__(self, setting):
         self.reward_factor = setting['reward_factor']
         self.reward_th = setting['reward_th']
+        self.slope = setting['slope']
+        self.roughness = setting['roughness']
         self.dis2target_last = 0
 
     # IN: object mask delivered by unrealcv client, mask, and pose
     # OUT: reward
-    def reward_mask(self, mask,
+
+    def reward_mask(self, pose, slope, roughness,
                     factor,
                     right_shift_one,
                     right_shift_two,
                     stretch_one,
                     stretch_two):
         reward = 0
-        height, width = mask.shape
-        tot_num_pixels = height*width
-        fov_score = (cv2.sumElems(mask)[0] / 255) / tot_num_pixels
-        log.warn("FOV Score: {}".format(fov_score))
 
-        reward = factor*(np.tanh((1/stretch_one)*(2*np.pi*fov_score-right_shift_one*np.pi)) +
-                         np.tanh((1/stretch_two)*(2*np.pi*fov_score-right_shift_two*np.pi)))
-        log.warn("Reward for FOV: {}".format(reward))
+        mask_score = 0
 
-        return reward, fov_score
+        #height, width = mask.shape
+        #tot_num_pixels = height*width
+        #fov_score = (cv2.sumElems(mask)[0] / 255) / tot_num_pixels
+        log.warn("Mask Score: {}".format(mask_score))
 
-    def reward_height(self, pose,
+        reward = factor*(np.tanh((1/stretch_one)*(2*np.pi*mask_score-right_shift_one*np.pi)) +
+                         np.tanh((1/stretch_two)*(2*np.pi*mask_score-right_shift_two*np.pi)))
+        log.warn("Reward for Mask: {}".format(reward))
+
+        return reward, mask_score
+
+    def reward_height(self, height_landing, pose,
                       scale,
                       stretch):
         reward = 0
         height = pose[2]
-        log.warn("Height for reward height {}".format(height))
+        distance = height - height_landing
 
-        interim = scale*np.tanh((1/stretch)*height)
+        log.warn("Height for reward height {}".format(distance))
+
+        interim = scale*np.tanh((1/stretch)*distance)
         log.warn("Interim Height: {}".format(interim))
 
-        reward  = (-1)*np.max(np.asarray([0,interim]))
+        reward  = (-1)*np.max(np.asarray([0,interim]))  # delete max to have negative reward
         log.warn("Reward Height: {}".format(reward))
 
-        return reward
+        return reward, distance
 
-    def reward_mask_height(self, mask, pose, done_thr, success_thr,
+    def reward_mask_height(self, pose,  height_landing, slope, roughness, done_thr, success_thr,
                            factor=100,
                            right_shift_one=1,
                            right_shift_two=1.5,
@@ -56,8 +64,9 @@ class Reward():
         done    = False
         success = False
         reward  = 0
-        reward_fov, fov_score = self.reward_mask(mask, factor, right_shift_one, right_shift_two, stretch_one, stretch_two)
-        reward_height = self.reward_height(pose, scale, stretch)
+        reward_fov, fov_score = self.reward_mask(pose, slope, roughness, factor, right_shift_one, right_shift_two, stretch_one, stretch_two)
+        reward_height, distance = self.reward_height(height_landing, pose, scale, stretch)
+        reward_distance = self.reward_distance(distance)
 
         reward = reward_fov + reward_height
 

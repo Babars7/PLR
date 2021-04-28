@@ -8,11 +8,8 @@ import pickle
 import numpy as np
 import glog as log
 import subprocess
-import tqdm
 
-#import gym_unrealcv
-
-
+import gym_unrealcv
 import real_lsd
 
 from PPOagent import PPOAgent
@@ -26,9 +23,9 @@ num_steps        = 20
 mini_batch_size  = 5
 ppo_epochs       = 4
 max_frames       = 15000
-threshold_reward = - 200
 
 '''---------------------------------------------------------------'''
+
 
 '''---------------------------Helper functions--------------------'''
 def save_obj(obj, filename):
@@ -89,12 +86,12 @@ def test_env():
 '''---------------------------------------------------------------'''
 
 # LOG LEVEL: Set to INFO for debugging
-log.setLevel("INFO")   # WARN
-log.warn
+log.setLevel("WARN")
+
 
 # Copy settings file to data folder
 abs_path = os.path.dirname(real_lsd.__file__) + '/envs/settings/landing/cpptest.json'
-cp_path  = '/media/scratch1/nasib/data/' # DATAPATH TODO
+cp_path  = '/home/plr/old_project/data' # DATAPATH TODO
 list_files = subprocess.run(["cp", abs_path, cp_path])
 log.warn("The exit code was: %d" % list_files.returncode)
 
@@ -157,11 +154,8 @@ early_stop = False
 # Reset environment and load starting state into state
 state = env.reset()
 
-# Training loop
-log.warn("Start training")
-log.setLevel("ERROR")
-pbar = tqdm.tqdm(total=max_frames)
 
+# Training loop
 while frame_idx < max_frames and not early_stop:
     log.warn("Frame: {}".format(frame_idx))
     log_probs = []
@@ -173,8 +167,6 @@ while frame_idx < max_frames and not early_stop:
     entropy = 0
 
     for st in range(num_steps):
-        #print("Frame ", frame_idx, "/", max_frames, "\r", end='', flush=True) # added
-        pbar.update(1)
         action = None
         state = torch.FloatTensor(state).to(device)
         log.info("Model Input: {}".format(state))
@@ -307,8 +299,6 @@ while frame_idx < max_frames and not early_stop:
 
     ### END while loop
 
-pbar.close()
-
 # Save data collected during training
 training_data['test_rewards'] = test_rewards
 training_data['test_mean_rewards'] = test_mean_rewards
@@ -321,17 +311,14 @@ del test_rewards
 del test_mean_rewards
 del values_at_beginning
 
-#log.setLevel("WARN") # added
-
 # Save model
 log.warn("Saving the model.")
 agent.save_model()
 
 log.warn("Training completed.")
-print("Training completed")
+
 
 '''------------------- Testing the policy after training --------------------'''
-print("Start testing")
 # Testing parameters
 num_tests = 1
 episodes_per_test = 50
@@ -339,7 +326,6 @@ successful_episodes = 0
 
 log.warn("Setting model to eval, setup for testing.")
 agent.model.eval()
-pbar2 = tqdm.tqdm(total=episodes_per_test * num_tests)
 
 with torch.no_grad():
     for test in range(num_tests):
@@ -352,7 +338,6 @@ with torch.no_grad():
 
         while episode_count < num_test_episodes:
 
-            pbar2.update(1)
             done = False
             episode = {}
 
@@ -406,14 +391,12 @@ with torch.no_grad():
 
             key = 'episode_{}'.format(episode_count)
             episodes[key] = episode
-        
-        pbar2.close()
+
         filename = time.strftime("%Y%m%d_%H%M%S") + '{}'.format(test)
         log.warn("About to save the test data.")
         file = save_obj(episodes, filename)
         del episodes
         log.warn("Successes out of {}: {}".format(num_tests*episodes_per_test, successful_episodes))
-        print("Successes out of {}: {}".format(num_tests*episodes_per_test, successful_episodes))
         # print(load_obj(file))
 
 log.warn("Done Testing.")

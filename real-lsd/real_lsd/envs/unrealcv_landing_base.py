@@ -50,6 +50,9 @@ class UnrealCvLanding_base(gym.Env):
         self.target_object         = setting['target_object']
         self.discrete_actions      = setting['discrete_actions']
         self.continous_actions     = setting['continous_actions']
+        self.points                = setting['points']
+        self.slope                 = setting['slope']
+        self.roughness             = setting['roughness']
 
         self.docker                = docker
         self.reset_type            = reset_type                                 # Not Sure about reset_type
@@ -101,6 +104,9 @@ class UnrealCvLanding_base(gym.Env):
         # for reset point generation and selection
         log.info("Initialized with RESET TYPE: {}".format(reset_type))
         self.reset_module           = reset_point.ResetPoint(setting, reset_type, current_pose)
+
+    def nearest_point(self, x, y)
+        aa
 
     def _step(self, action ):
         info = dict(
@@ -154,6 +160,7 @@ class UnrealCvLanding_base(gym.Env):
         info['Collision']  = self.unrealcv.move_3d(self.cam_id, delta_x, delta_y, delta_z)
         info['Pose']       = self.unrealcv.get_pose(self.cam_id)
 
+    
         # Update observation
         state              = self.unrealcv.get_observation(self.cam_id, self.observation_type)
 
@@ -184,14 +191,22 @@ class UnrealCvLanding_base(gym.Env):
                 info['Reward']+= -500
                 info['Done']   = True
 
+        # obtain nearest point and its features
+        pose = info['Pose']
+        idx = self.nearest_point(pose[0], pose[1])
+        height_landing = self.points[2]
+        slope = self.slope[idx]
+        roughness = self.roughness[idx]
+        
+        
         if 'mask' in self.reward_type: # and not info['Collision']:
             # get segmented image
-            object_mask    = self.unrealcv.read_image(self.cam_id, 'object_mask')
+            #object_mask    = self.unrealcv.read_image(self.cam_id, 'object_mask')
             # get_mask gets you a binary image, either 0 or 255 per pixel
-            mask           = self.unrealcv.get_mask(object_mask, self.target_object)
+            #mask           = self.unrealcv.get_mask(object_mask, self.target_object)
 
             # TODO: CHANGE reward function here
-            rew, done, suc = self.reward_function.reward_mask_height(mask, info['Pose'], self.done_th, self.success_th)
+            rew, done, suc = self.reward_function.reward_mask_height(info['Pose'], height_landing, slope, roughness, self.done_th, self.success_th)
             info['Success'] = suc
             info['Reward'] += rew
 
