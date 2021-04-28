@@ -50,9 +50,10 @@ class UnrealCvLanding_base(gym.Env):
         self.target_object         = setting['target_object']
         self.discrete_actions      = setting['discrete_actions']
         self.continous_actions     = setting['continous_actions']
-        self.points                = np.asarray(setting['points'][:,0:3])
-        self.slope                 = np.asarray(setting['points'][:,3])
-        self.roughness             = np.asarray(setting['points'][:,4])
+        points_list                = np.asarray(setting['points'])
+        self.points                = points_list[:,0:3]
+        self.slope                 = points_list[:,3]
+        self.roughness             = points_list[:,4]
         log.warn("Points in the mesh: {}".format(self.points.shape))
         
 
