@@ -55,6 +55,7 @@ class UnrealCvLanding_base(gym.Env):
         self.slope                 = points_list[:,3]
         self.roughness             = points_list[:,4]
         log.warn("Points in the mesh: {}".format(self.points.shape))
+        log.warn("Stepscale: {}".format(self.stepscale))
         
 
         self.docker                = docker
