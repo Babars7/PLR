@@ -39,7 +39,7 @@ setting_file = 'landing/{env}.json'.format(env=env)
 settings = load_env_setting(setting_file)
 action ='Discrete'
 obs = 'HeightFeatures'
-category = settings['targets']["FloorGood"]:
+category = settings['targets']["FloorGood"]
 for i, reset in enumerate(['random']):
 
 	            register(
