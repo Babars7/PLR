@@ -103,7 +103,7 @@ class UnrealCvLanding_base(gym.Env):
         self.unrealcv.set_location(self.cam_id, current_pose[:3])
 
         self.count_steps            = 0
-        self.targets_pos            = self.unrealcv.build_pose_dic(self.target_list)
+        #self.targets_pos            = self.unrealcv.build_pose_dic(self.target_list)
 
         # for reset point generation and selection
         log.info("Initialized with RESET TYPE: {}".format(reset_type))
