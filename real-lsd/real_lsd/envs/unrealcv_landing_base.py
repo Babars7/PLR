@@ -200,7 +200,7 @@ class UnrealCvLanding_base(gym.Env):
         # obtain nearest point and its features
         pose = info['Pose']
         idx = self.nearest_point_idx(pose[0], pose[1])
-        log.warn("Current x,y: {}, nearest point x,y: {}".format((pose[0],pose[1]), (self.points[idx,0],self.points[idx,1]))
+        log.warn("Current x,y: {}, nearest point x,y: {}".format((pose[0],pose[1]), (self.points[idx,0],self.points[idx,1])))
         height_landing = self.points[idx,2]
         slope = self.slope[idx]
         roughness = self.roughness[idx]
