@@ -39,7 +39,7 @@ setting_file = 'landing/{env}.json'.format(env=env)
 settings = load_env_setting(setting_file)
 action ='Discrete'
 obs = 'HeightFeatures'
-category = settings['targets']["FloorGood"]
+category = 'FloorGood'
 for i, reset in enumerate(['random']):
 
 	            register(
@@ -55,5 +55,5 @@ for i, reset in enumerate(['random']):
 	                        },
 	                max_episode_steps=200
 	            )
-	            log.info('Registered env: '+ 'MyUnrealLand-{env}{category}-{action}{obs}-v{reset}'.format(env=env, category=category, action=action, obs=obs, reset=i))
+	            log.info('Registered env: '+ 'MyUnrealLand-{env}-{action}{obs}-v{reset}'.format(env=env, category=category, action=action, obs=obs, reset=i))
 
