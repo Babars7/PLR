@@ -159,13 +159,8 @@ state = env.reset()
 
 # Training loop
 while frame_idx < max_frames and not early_stop:
-    log.warn("Frame: {}".format(frame_idx))
-    log.warn("Frame: {}".format(frame_idx))
-    log.warn("Frame: {}".format(frame_idx))
-    log.warn("Frame: {}".format(frame_idx))
-    log.warn("Frame: {}".format(frame_idx))
-    log.warn("Frame: {}".format(frame_idx))
-    log.warn("Frame: {}".format(frame_idx))
+    log.warn("\n\n\nFrame: {}".format(frame_idx))
+    log.warn("Frame: {}\n\n\n".format(frame_idx))
     log_probs = []
     values    = []
     states    = []
@@ -190,8 +185,8 @@ while frame_idx < max_frames and not early_stop:
         episode_now = episode_count
 
         # Output all layer activations to logstream
-        for i in range(5):
-            log.warn("actor layer {} activation: {}".format(i, activation['actor_layer_'+str(i)]))
+        #for i in range(5):
+        #    log.warn("actor layer {} activation: {}".format(i, activation['actor_layer_'+str(i)]))
 
         state = state.unsqueeze(1)
         state = torch.transpose(state, 0, 1)

@@ -46,7 +46,7 @@ class Reward():
         interim = scale*np.tanh((1/stretch)*distance)
         log.warn("Interim Height: {}".format(interim))
 
-        reward  = (-1)*np.max(np.asarray([0,interim]))  # delete max to have negative reward
+        reward  = (-1)*np.max(np.asarray([0,interim]))  # delete max to consider negative values
         log.warn("Reward Height: {}".format(reward))
 
         return reward, distance
@@ -54,6 +54,7 @@ class Reward():
     def reward_distance(self, dis2target_now):
         reward = (self.dis2target_last - dis2target_now) / max(self.dis2target_last, 100)
         self.dis2target_last = dis2target_now
+        log.warn("Reward distance: {}".format(reward))
         return reward
 
     def reward_mask_height(self, pose,  height_landing, slope, roughness, done_thr, success_thr,
@@ -71,7 +72,7 @@ class Reward():
         reward_height, distance = self.reward_height(height_landing, pose, scale, stretch)
         reward_distance = self.reward_distance(distance)
 
-        reward = reward_fov + reward_height #+ reward_distance
+        reward = reward_distance #+ reward_height + reward_FOV
 
         # Adding a step reward readded
         if distance < done_thr:
