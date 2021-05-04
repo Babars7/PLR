@@ -41,6 +41,7 @@ class UnrealCvLanding_base(gym.Env):
         # load in settings from json
         setting                    = self.load_env_setting(setting_file)
         self.cam_id                = setting['cam_id']
+        self.FOV                   = setting['FOV']
         self.maxsteps              = setting['maxsteps']
         self.stepscale             = setting['stepscale']
         self.target_list           = setting['targets'][category]
@@ -50,10 +51,10 @@ class UnrealCvLanding_base(gym.Env):
         self.target_object         = setting['target_object']
         self.discrete_actions      = setting['discrete_actions']
         self.continous_actions     = setting['continous_actions']
+        self.scale                 = setting['scale']
+        self.stretch               = setting['stretch']
         points_list                = np.asarray(setting['points'])
-        log.warn("points json: {}".format(points_list[4500,0:3]))
         self.points                = 100*points_list[:,0:3]
-        log.warn("points mesh: {}".format(self.points[4500,0:3]))
         self.slope                 = points_list[:,3]
         self.roughness             = points_list[:,4]
         log.warn("Points in the mesh: {}".format(self.points.shape))
@@ -160,7 +161,7 @@ class UnrealCvLanding_base(gym.Env):
         self.count_steps  += 1
 
         # Time Penalty
-        info['Reward']    += -10*self.count_steps
+        info['Reward']    += -1*self.count_steps  # -10
 
         self.unrealcv.set_step(self.count_steps)
         self.unrealcv.set_velocity(velocity)
@@ -172,6 +173,7 @@ class UnrealCvLanding_base(gym.Env):
 
     
         # Update observation
+        self.unrealcv.set_FOV(self.cam_id, self.FOV)
         state              = self.unrealcv.get_observation(self.cam_id, self.observation_type)
 
         if self.observation_type in ['Color', 'Rgbd', 'PoseColor', 'HeightFeatures', 'StepHeightFeatures', 'StepHeightVelocityFeatures']:
@@ -204,11 +206,14 @@ class UnrealCvLanding_base(gym.Env):
         # obtain nearest point and its features
         pose = info['Pose']
         idx = self.nearest_point_idx(pose[0], pose[1])
-        log.warn("Current x,y: {}, nearest point x,y: {}".format((pose[0],pose[1]), (self.points[idx,0],self.points[idx,1])))
-        height_landing = self.points[idx,2]
+        #log.warn("Current x,y: {}, nearest point x,y: {}".format((pose[0],pose[1]), (self.points[idx,0],self.points[idx,1])))
+        nearest_triangle = self.points[idx,0:2]
+        mesh_height = self.points[idx,2]
         slope = self.slope[idx]
         roughness = self.roughness[idx]
         
+        error = np.array(nearest_triangle) - np.array(pose[0:2])
+        error = np.linalg.norm(error)
         
         if 'mask' in self.reward_type: # and not info['Collision']:
             # get segmented image
@@ -217,7 +222,10 @@ class UnrealCvLanding_base(gym.Env):
             #mask           = self.unrealcv.get_mask(object_mask, self.target_object)
 
             # TODO: CHANGE reward function here
-            rew, done, suc = self.reward_function.reward_mask_height(info['Pose'], height_landing, slope, roughness, self.done_th, self.success_th)
+            rew, done, suc = self.reward_function.reward_mask_height(info['Pose'], error, mesh_height, 
+                                                                    slope, roughness, 
+                                                                    self.scale, self.stretch,
+                                                                    self.done_th, self.success_th)
             info['Success'] = suc
             info['Reward'] += rew
 

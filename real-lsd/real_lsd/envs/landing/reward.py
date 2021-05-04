@@ -9,6 +9,7 @@ class Reward():
         self.reward_factor = setting['reward_factor']
         self.reward_th = setting['reward_th']
         self.dis2target_last = 0
+        self.stepscale = setting['stepscale']
 
     # IN: object mask delivered by unrealcv client, mask, and pose
     # OUT: reward
@@ -34,17 +35,17 @@ class Reward():
 
         return reward, mask_score
 
-    def reward_height(self, height_landing, pose,
+    def reward_height(self, mesh_height, pose,
                       scale,
                       stretch):
         reward = 0
         height = pose[2]
-        distance = height - height_landing
+        distance = height - mesh_height
 
-        log.warn("Height for reward height {}".format(distance))
+        #log.warn("Height for reward height {}".format(distance))
 
         interim = scale*np.tanh((1/stretch)*distance)
-        log.warn("Interim Height: {}".format(interim))
+        #log.warn("Interim Height: {}".format(interim))
 
         reward  = (-1)*np.max(np.asarray([0,interim]))  # delete max to consider negative values
         log.warn("Reward Height: {}".format(reward))
@@ -52,40 +53,44 @@ class Reward():
         return reward, distance
 
     def reward_distance(self, dis2target_now):
-        reward = (self.dis2target_last - dis2target_now) / max(self.dis2target_last, 100)
+        reward = 10*(self.dis2target_last - dis2target_now) / max(self.dis2target_last/10, 200)
         self.dis2target_last = dis2target_now
-        log.warn("Reward distance: {}".format(reward))
+        log.warn("Reward Distance: {}".format(reward))
         return reward
 
-    def reward_mask_height(self, pose,  height_landing, slope, roughness, done_thr, success_thr,
+    def reward_mask_height(self, pose,  error, mesh_height, slope, roughness, scale, stretch, done_thr, success_thr,
                            factor=100,
                            right_shift_one=1,
                            right_shift_two=1.5,
                            stretch_one=9,
-                           stretch_two=2,
-                           scale=300,
-                           stretch=3000):
+                           stretch_two=2): #scale 300, stretch 3000
         done    = False
         success = False
         reward  = 0
         #reward_fov, mask_score = self.reward_mask(pose, slope, roughness, factor, right_shift_one, right_shift_two, stretch_one, stretch_two)
-        reward_height, distance = self.reward_height(height_landing, pose, scale, stretch)
+        reward_height, distance = self.reward_height(mesh_height, pose, scale, stretch)
         reward_distance = self.reward_distance(distance)
 
-        reward = reward_distance #+ reward_height + reward_FOV
+        reward = reward_distance + reward_height #+ reward_FOV
 
         # Adding a step reward readded
-        if distance < done_thr:
+        if error > 5 * self.stepscale:
             done = True
-            mask_score = 0.9 # delete when using roughness and slope
-            if mask_score > success_thr:
-                reward += 500
-                log.warn("SUCCESS")
-                success = True
-            else:
-                reward -= 500
+            reward -= 10000
+            log.warn("OUT OF BOUNDARIES")
+        else
+            if distance < done_thr:
+                done = True
+                mask_score = 0.9 # delete when using roughness and slope
+                #here slope, roughness reward
+                if mask_score > success_thr:
+                    reward += 500
+                    log.warn("SUCCESS")
+                    success = True
+                else:
+                    reward -= 500
 
-        log.warn("Reward Total: {}".format(reward))
+        #log.warn("Reward Total: {}".format(reward))
         return reward, done, success
 
     def reward_sinc(self, mask, pose, done_thr, success_thr,

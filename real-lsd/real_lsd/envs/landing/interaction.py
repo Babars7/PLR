@@ -79,7 +79,7 @@ class Landing(UnrealCv):
             self.img_depth = self.read_depth(cam_id)
 
             self.height = np.asarray([self.get_pose(cam_id, type='hard')[2]], dtype=np.float64)
-            log.warn("height is: {} with dimension: {}".format(self.height, self.height.shape))
+            #log.warn("height is: {} with dimension: {}".format(self.height, self.height.shape))
 
             self.features = self.get_features(cam_id, 'lit')
             log.info("Features are dimension: {}".format(self.features.shape))
@@ -241,6 +241,10 @@ class Landing(UnrealCv):
             self.cam[cam_id]['rotation'] = self.get_rotation(cam_id)
             pose = self.cam[cam_id]['location'] + self.cam[cam_id]['rotation']
             return pose
+
+    def set_FOV(self, cam_id, FOV):
+        cmd = 'vset /camera/{cam_id}/horizontal_fieldofview {FOV}'
+        self.client.request(cmd.format(cam_id=cam_id, FOV=FOV))
 
     def set_step(self, step):
         self.step = step

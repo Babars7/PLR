@@ -13,7 +13,7 @@ import real_lsd
 # multiprocess environment
 # example env name
 # UnrealLand-cpptestFloorGood-DiscretePoseColor-v0
-env = gym.make('MyUnrealLand-cpptestFloorGood-DiscretePoseColor-v0')
+env = gym.make('MyUnrealLand-gornerFloorGood-DiscreteHeightFeatures-v0')
 # env = make_vec_env('UnrealSearch-RealisticRoomDoor-DiscreteColor-v0', n_envs=1)
 
 # PP02 with mlp network for both actor and critic, both with two layers and 64
