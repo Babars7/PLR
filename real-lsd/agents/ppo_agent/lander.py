@@ -32,7 +32,7 @@ threshold_reward = -200
 def save_obj(obj, filename):
     dir = 'data'
     # path = os.getcwd()
-    PATH = '/media/scratch1/nasib'
+    PATH = '/home/plr/PLR'    # '/media/scratch2/plr_project/PLR'
 
     if dir not in os.listdir(PATH):
         PATH =  os.path.join(PATH, dir)
@@ -92,7 +92,7 @@ log.setLevel("WARN")
 
 # Copy settings file to data folder
 abs_path = os.path.dirname(real_lsd.__file__) + '/envs/settings/landing/gorner.json'
-cp_path  = '/home/nicloi/plr_project/data' # DATAPATH TODO
+cp_path  = '/home/plr/PLR/data' # '/home/nicloi/plr_project/data'
 list_files = subprocess.run(["cp", abs_path, cp_path])
 log.warn("The exit code was: %d" % list_files.returncode)
 
@@ -159,7 +159,8 @@ state = env.reset()
 
 # Training loop
 while frame_idx < max_frames and not early_stop:
-    log.warn("\n\n\nFrame: {}".format(frame_idx))
+    log.warn("\n\n\n")
+    log.warn("Frame: {}".format(frame_idx))
     log.warn("Frame: {}\n\n\n".format(frame_idx))
     log_probs = []
     values    = []
@@ -200,7 +201,7 @@ while frame_idx < max_frames and not early_stop:
         log.info("Action TYPE: {}, SHAPE: {}".format(type(action), action.shape))
 
         action_not_same = not (action == prior_action)
-        log.warn("Sampled Action is not same as prior action: {}".format(action_not_same))
+        #log.warn("Sampled Action is not same as prior action: {}".format(action_not_same))
         prior_action = action
 
         next_state, reward, done, _ = env.step(action.cpu().numpy())
