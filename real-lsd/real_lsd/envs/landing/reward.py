@@ -97,7 +97,7 @@ class Reward():
         
 
         #log.warn("Reward Total: {}".format(reward))
-        return reward, done, success
+        return reward, done, success, distance
 
     def reward_sinc(self, mask, pose, done_thr, success_thr,
                         normalization_factor=3000,

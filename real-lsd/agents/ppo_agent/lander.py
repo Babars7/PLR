@@ -76,7 +76,7 @@ def test_env():
     while not done:
         state = torch.FloatTensor(state).unsqueeze(0).to(device)
         dist, _ = agent.model(state)
-        next_state, reward, done, _ = env.step(dist.sample().cpu().numpy()[0])
+        next_state, reward, done, _, _ = env.step(dist.sample().cpu().numpy()[0])
         state = next_state
         steps +=1
         total_reward += reward
@@ -204,8 +204,10 @@ while frame_idx < max_frames and not early_stop:
         #log.warn("Sampled Action is not same as prior action: {}".format(action_not_same))
         prior_action = action
 
-        next_state, reward, done, _ = env.step(action.cpu().numpy())
+        next_state, reward, done, _, mesh_dist = env.step(action.cpu().numpy())
         log.warn("Step REWARD: {} DONE: {}".format(reward, done))
+
+        log.warn("Distance to mesh: {}".format(mesh_dist))
 
         log_prob = dist.log_prob(action)
         log.info("Step LOG_PROB: {}".format(log_prob))
@@ -353,6 +355,7 @@ with torch.no_grad():
             rewards   = []
             log_probs = []
             traj      = []
+            mesh_dists = []
 
             while not done:
                 action = 0
@@ -365,7 +368,7 @@ with torch.no_grad():
                 log.info("action type: {}".format(action))
                 log_prob = dist.log_prob(action)
 
-                next_state, reward, done, info = env.step(action.cpu().numpy())
+                next_state, reward, done, info,  mesh_dist = env.step(action.cpu().numpy())
 
                 # poses.append(info['Pose'])
                 dists.append(dist)
@@ -373,6 +376,7 @@ with torch.no_grad():
                 actions.append(action.cpu().numpy())
                 log_probs.append(log_prob.cpu().numpy())
                 rewards.append(reward)
+                mesh_dists.append(mesh_dist)
 
                 # next state logic
                 if done:
@@ -392,11 +396,15 @@ with torch.no_grad():
             episode['rewards']  = rewards
             episode['log_probs'] = log_probs
             episode['trajectory']= traj
+            episode['mesh_dists'] = mesh_dists
 
             key = 'episode_{}'.format(episode_count)
             episodes[key] = episode
 
+            log.warn("Successes out of {}: {}".format(episode_count, successful_episodes))
+
         filename = time.strftime("%Y%m%d_%H%M%S") + '{}'.format(test)
+        log.warn("Successes out of {}: {}".format(num_tests*episodes_per_test, successful_episodes))
         log.warn("About to save the test data.")
         file = save_obj(episodes, filename)
         del episodes

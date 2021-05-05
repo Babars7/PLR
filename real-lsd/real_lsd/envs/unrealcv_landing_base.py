@@ -260,7 +260,7 @@ class UnrealCvLanding_base(gym.Env):
         else:
             info['Reward']  = 0
 
-        return state, info['Reward'], info['Done'], info
+        return state, info['Reward'], info['Done'], info, mesh_dist
 
     def _reset(self, ):
         # double check the resetpoint, it is necessary for random reset type
