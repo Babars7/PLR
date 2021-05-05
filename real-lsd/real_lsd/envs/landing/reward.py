@@ -78,7 +78,7 @@ class Reward():
             done = True
             reward -= 10000
             log.warn("OUT OF BOUNDARIES")
-        else
+        else:
             if distance < done_thr:
                 done = True
                 mask_score = 0.9 # delete when using roughness and slope
