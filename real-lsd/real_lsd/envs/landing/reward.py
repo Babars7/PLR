@@ -58,7 +58,7 @@ class Reward():
         log.warn("Reward Distance: {}".format(reward))
         return reward
 
-    def reward_mask_height(self, pose,  error, mesh_height, slope, roughness, scale, stretch, done_thr, success_thr,
+    def reward_mask_height(self, pose,  error, mesh_height, slope, roughness, landable, dist_landable, scale, stretch, done_thr, success_thr,
                            factor=100,
                            right_shift_one=1,
                            right_shift_two=1.5,
@@ -81,15 +81,20 @@ class Reward():
         else:
             if distance < done_thr:
                 done = True
-                mask_score = 0.9 # delete when using roughness and slope
+                
                 #here slope, roughness reward
-                if mask_score > success_thr:
+                if landable == 1:
                     reward += 500
                     log.warn("SUCCESS landed correctly")
                     success = True
                 else:
                     log.warn("FAILED landed incorrectly")
                     reward -= 500
+
+            if dist_landable < 100: #100 is like threshold that can be modified
+            reward += 10
+
+        
 
         #log.warn("Reward Total: {}".format(reward))
         return reward, done, success

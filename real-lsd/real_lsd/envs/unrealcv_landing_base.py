@@ -57,6 +57,7 @@ class UnrealCvLanding_base(gym.Env):
         self.points                = 100*points_list[:,0:3]
         self.slope                 = points_list[:,3]
         self.roughness             = points_list[:,4]
+        self.landable              = points_list[:,5] #added Valentin
         log.warn("Points in the mesh: {}".format(self.points.shape))
         log.warn("Stepscale: {}".format(self.stepscale))
         
@@ -118,6 +119,15 @@ class UnrealCvLanding_base(gym.Env):
         deltas = self.points[:,0:2] - point 
         dist_2 = np.einsum('ij,ij->i', deltas, deltas) 
         return np.argmin(dist_2)
+
+    def nearest_point_idx_landable(self, x, y):
+        point = np.array([x,y])
+        deltas = self.points[:,0:2] - point
+        landable = self.points[:,5] 
+        dist_3 = np.einsum('ij,ij->i', deltas, deltas)
+        deltas_2 = np.multiply(landable, dist_3)
+        masked = np.ma.masked_equal(deltas_2, 0.0, copy=False) 
+        return masked.argmin()
 
     def _step(self, action ):
         info = dict(
@@ -208,9 +218,12 @@ class UnrealCvLanding_base(gym.Env):
         idx = self.nearest_point_idx(pose[0], pose[1])
         #log.warn("Current x,y: {}, nearest point x,y: {}".format((pose[0],pose[1]), (self.points[idx,0],self.points[idx,1])))
         nearest_triangle = self.points[idx,0:2]
+        landable_near = self.nearest_point_idx_landable(pose[0], pose[1])
+        dist_landable = np.linalg.norm(self.points[idx,1:2]-self.points[landable_near,1:2])
         mesh_height = self.points[idx,2]
         slope = self.slope[idx]
         roughness = self.roughness[idx]
+        landable = self.landable[idx]
         
         error = np.array(nearest_triangle) - np.array(pose[0:2])
         error = np.linalg.norm(error)
@@ -223,7 +236,7 @@ class UnrealCvLanding_base(gym.Env):
 
             # TODO: CHANGE reward function here
             rew, done, suc = self.reward_function.reward_mask_height(info['Pose'], error, mesh_height, 
-                                                                    slope, roughness, 
+                                                                    slope, roughness, landable, dist_landable 
                                                                     self.scale, self.stretch,
                                                                     self.done_th, self.success_th)
             info['Success'] = suc
