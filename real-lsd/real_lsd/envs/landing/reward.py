@@ -85,9 +85,10 @@ class Reward():
                 #here slope, roughness reward
                 if mask_score > success_thr:
                     reward += 500
-                    log.warn("SUCCESS")
+                    log.warn("SUCCESS landed correctly")
                     success = True
                 else:
+                    log.warn("FAILED landed incorrectly")
                     reward -= 500
 
         #log.warn("Reward Total: {}".format(reward))
