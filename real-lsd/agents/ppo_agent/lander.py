@@ -207,7 +207,7 @@ while frame_idx < max_frames and not early_stop:
         next_state, reward, done, info = env.step(action.cpu().numpy())
         log.warn("Step REWARD: {} DONE: {}".format(reward, done))
 
-        log.warn("Distance to mesh: {}".format(info['Mesh_dist']))
+        log.warn("Distance to mesh: {}".format(info['Mesh_dists']))
 
         log_prob = dist.log_prob(action)
         log.info("Step LOG_PROB: {}".format(log_prob))
