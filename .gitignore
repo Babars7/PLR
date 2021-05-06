@@ -1,1 +1,10 @@
 gym-unrealcv/
+data/
+actor
+actor.png
+critic
+critic.png
+media
+nohup.out
+*.pyc
+
