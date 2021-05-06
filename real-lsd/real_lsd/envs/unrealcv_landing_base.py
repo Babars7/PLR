@@ -248,7 +248,7 @@ class UnrealCvLanding_base(gym.Env):
                 info['Done']   = True
 
             if self.count_steps >= self.maxsteps and not info['Success']:
-                log.warn("MAX STEPS EXCEEDED)
+                log.warn("MAX STEPS EXCEEDED")
                 info['Reward'] += -50
                 info['Done']   = True
 
