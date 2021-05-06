@@ -76,7 +76,7 @@ class Reward():
         # Adding a step reward readded
         if error > 5 * self.stepscale:
             done = True
-            reward -= 10000
+            reward -= 100
             log.warn("OUT OF BOUNDARIES")
         else:
             if distance < done_thr:
@@ -84,15 +84,15 @@ class Reward():
                 
                 #here slope, roughness reward
                 if landable == 1:
-                    reward += 500
+                    reward += 50
                     log.warn("SUCCESS landed correctly")
                     success = True
                 else:
                     log.warn("FAILED landed incorrectly")
-                    reward -= 500
+                    reward -= 50
 
-            if dist_landable < 100: #100 is like threshold that can be modified
-            reward += 10
+            #if dist_landable < 100: #100 is like threshold that can be modified
+            #reward += 10
 
         
 
