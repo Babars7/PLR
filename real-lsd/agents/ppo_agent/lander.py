@@ -76,7 +76,7 @@ def test_env():
     while not done:
         state = torch.FloatTensor(state).unsqueeze(0).to(device)
         dist, _ = agent.model(state)
-        next_state, reward, done, _, _ = env.step(dist.sample().cpu().numpy()[0])
+        next_state, reward, done, _, = env.step(dist.sample().cpu().numpy()[0])
         state = next_state
         steps +=1
         total_reward += reward
@@ -204,10 +204,10 @@ while frame_idx < max_frames and not early_stop:
         #log.warn("Sampled Action is not same as prior action: {}".format(action_not_same))
         prior_action = action
 
-        next_state, reward, done, _, mesh_dist = env.step(action.cpu().numpy())
+        next_state, reward, done, info = env.step(action.cpu().numpy())
         log.warn("Step REWARD: {} DONE: {}".format(reward, done))
 
-        log.warn("Distance to mesh: {}".format(mesh_dist))
+        log.warn("Distance to mesh: {}".format(info['Mesh_dist']))
 
         log_prob = dist.log_prob(action)
         log.info("Step LOG_PROB: {}".format(log_prob))
@@ -368,7 +368,7 @@ with torch.no_grad():
                 log.info("action type: {}".format(action))
                 log_prob = dist.log_prob(action)
 
-                next_state, reward, done, info,  mesh_dist = env.step(action.cpu().numpy())
+                next_state, reward, done, info = env.step(action.cpu().numpy())
 
                 # poses.append(info['Pose'])
                 dists.append(dist)
@@ -383,6 +383,7 @@ with torch.no_grad():
                     if info['Success']:
                         successful_episodes += 1
                     traj = info['Trajectory']
+                    mesh_dists = info['Mesh_dists']
                     state = env.reset()
                     episode_count += 1
                 else:

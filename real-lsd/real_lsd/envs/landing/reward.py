@@ -71,7 +71,7 @@ class Reward():
         reward_height, distance = self.reward_height(mesh_height, pose, scale, stretch)
         reward_distance = self.reward_distance(distance)
 
-        reward = reward_distance + reward_height #+ reward_FOV
+        reward = reward_distance #+ reward_height #+ reward_FOV
 
         # Adding a step reward readded
         if error > 5 * self.stepscale:
@@ -93,8 +93,6 @@ class Reward():
 
             #if dist_landable < 100: #100 is like threshold that can be modified
             #reward += 10
-
-        
 
         #log.warn("Reward Total: {}".format(reward))
         return reward, done, success, distance

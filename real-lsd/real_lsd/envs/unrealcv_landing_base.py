@@ -240,6 +240,7 @@ class UnrealCvLanding_base(gym.Env):
                                                                     self.done_th, self.success_th)
             info['Success'] = suc
             info['Reward'] += rew
+            info['Mesh_dists'] = mesh_dist
 
             if info['Collision'] and not info['Success']:
                 log.warn("COLLISION")
@@ -259,7 +260,7 @@ class UnrealCvLanding_base(gym.Env):
         else:
             info['Reward']  = 0
 
-        return state, info['Reward'], info['Done'], info, mesh_dist
+        return state, info['Reward'], info['Done'], info
 
     def _reset(self, ):
         # double check the resetpoint, it is necessary for random reset type
