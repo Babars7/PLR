@@ -234,7 +234,7 @@ class UnrealCvLanding_base(gym.Env):
             #mask           = self.unrealcv.get_mask(object_mask, self.target_object)
 
             # TODO: CHANGE reward function here
-            rew, done, suc = self.reward_function.reward_mask_height(info['Pose'], error, mesh_height, 
+            rew, done, suc, mesh_dist = self.reward_function.reward_mask_height(info['Pose'], error, mesh_height, 
                                                                     slope, roughness, landable, dist_landable,
                                                                     self.scale, self.stretch,
                                                                     self.done_th, self.success_th)
