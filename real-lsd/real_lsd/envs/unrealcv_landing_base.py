@@ -123,9 +123,8 @@ class UnrealCvLanding_base(gym.Env):
     def nearest_point_idx_landable(self, x, y):
         point = np.array([x,y])
         deltas = self.points[:,0:2] - point
-        landable = self.points[:,5] 
         dist_3 = np.einsum('ij,ij->i', deltas, deltas)
-        deltas_2 = np.multiply(landable, dist_3)
+        deltas_2 = np.multiply(self.landable, dist_3)
         masked = np.ma.masked_equal(deltas_2, 0.0, copy=False) 
         return masked.argmin()
 
