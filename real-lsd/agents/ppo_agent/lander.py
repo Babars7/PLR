@@ -92,7 +92,7 @@ log.setLevel("WARN")
 
 # Copy settings file to data folder
 abs_path = os.path.dirname(real_lsd.__file__) + '/envs/settings/landing/gorner.json'
-cp_path  = '/home/nicloi/plr_project/data' #'/home/plr/PLR/data/json' # '/home/nicloi/plr_project/data'
+cp_path  = '/home/nicloi/plr_project/PLR/data/json' #'/home/plr/PLR/data/json' # '/home/nicloi/plr_project/data'
 list_files = subprocess.run(["cp", abs_path, cp_path])
 log.warn("The exit code was: %d" % list_files.returncode)
 

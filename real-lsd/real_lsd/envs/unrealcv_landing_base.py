@@ -236,7 +236,7 @@ class UnrealCvLanding_base(gym.Env):
 
             # TODO: CHANGE reward function here
             rew, done, suc = self.reward_function.reward_mask_height(info['Pose'], error, mesh_height, 
-                                                                    slope, roughness, landable, dist_landable 
+                                                                    slope, roughness, landable, dist_landable,
                                                                     self.scale, self.stretch,
                                                                     self.done_th, self.success_th)
             info['Success'] = suc
