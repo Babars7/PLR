@@ -33,16 +33,24 @@ def save_obj(obj, filename):
     dir = 'data'
     # path = os.getcwd()
     PATH = '/media/scratch2/plr_project/PLR'  #'/home/plr/PLR'    # '/media/scratch2/plr_project/PLR'
+    print("1")
 
     if dir not in os.listdir(PATH):
         PATH =  os.path.join(PATH, dir)
         os.mkdir(PATH)
     else:
         PATH =  os.path.join(PATH, dir)
+    print("2")
 
     abs_file_path = PATH + '/' + filename + '.pkl'
+    print("3")
     with open(abs_file_path, 'wb') as f:
+        print("4")
+
         pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
+
+        print("5")
+    print("6")
 
     return filename
 
@@ -92,7 +100,7 @@ log.setLevel("WARN")
 
 # Copy settings file to data folder
 abs_path = os.path.dirname(real_lsd.__file__) + '/envs/settings/landing/gorner.json'
-cp_path  = '/home/nicloi/plr_project/PLR/data/json' #'/home/plr/PLR/data/json' # '/home/nicloi/plr_project/data'
+cp_path  = '/home/nicloi/plr_project/PLR/data/json/gorner' #'/home/plr/PLR/data/json' # '/home/nicloi/plr_project/data'
 list_files = subprocess.run(["cp", abs_path, cp_path])
 log.warn("The exit code was: %d" % list_files.returncode)
 
