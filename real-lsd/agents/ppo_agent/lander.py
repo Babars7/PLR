@@ -22,7 +22,7 @@ lr               = 3e-4
 num_steps        = 20
 mini_batch_size  = 5
 ppo_epochs       = 4
-max_frames       = 15000
+max_frames       = 1500
 threshold_reward = -200
 
 '''---------------------------------------------------------------'''
@@ -376,14 +376,13 @@ with torch.no_grad():
                 actions.append(action.cpu().numpy())
                 log_probs.append(log_prob.cpu().numpy())
                 rewards.append(reward)
-                mesh_dists.append(mesh_dist)
+                mesh_dists.append(info['Mesh_dists'])
 
                 # next state logic
                 if done:
                     if info['Success']:
                         successful_episodes += 1
                     traj = info['Trajectory']
-                    mesh_dists = info['Mesh_dists']
                     state = env.reset()
                     episode_count += 1
                 else:
