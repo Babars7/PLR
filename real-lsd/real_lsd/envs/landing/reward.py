@@ -55,7 +55,7 @@ class Reward():
     def reward_distance(self, dis2target_now):
         reward = 10*(self.dis2target_last - dis2target_now) / max(self.dis2target_last/10, 200)
         self.dis2target_last = dis2target_now
-        log.warn("Reward Distance: {}".format(reward))
+        #log.warn("Reward Distance: {}".format(reward))
         return reward
 
     def reward_mask_height(self, pose,  error, mesh_height, slope, roughness, landable, dist_landable, scale, stretch, done_thr, success_thr,
@@ -72,7 +72,7 @@ class Reward():
         reward_height, distance = self.reward_height(mesh_height, pose, scale, stretch)
         reward_distance = self.reward_distance(distance)
 
-        reward = reward_distance #+ reward_height #+ reward_FOV
+        reward = reward_height #+ reward_distance #+ reward_FOV
 
         # Adding a step reward readded
         if error > 5 * self.stepscale:

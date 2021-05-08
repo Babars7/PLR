@@ -229,7 +229,7 @@ class UnrealCvLanding_base(gym.Env):
             info['Reward'] += -5
             if self.trigger_count >= 5:
                 log.warn("TRIGGER activated")
-                info['Reward']+= -10
+                info['Reward']+= -5
                 info['Done']   = True
 
         # obtain nearest point and its features
