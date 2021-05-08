@@ -269,7 +269,8 @@ while frame_idx < max_frames and not early_stop:
         # next state logic
         if done:
             episode_count += 1
-            log.warn("Resetting.")
+            print(info)
+            log.warn("Resetting")          
             state = env.reset()
         else:
             state = next_state

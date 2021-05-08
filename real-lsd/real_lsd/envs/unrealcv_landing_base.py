@@ -56,7 +56,7 @@ class UnrealCvLanding_base(gym.Env):
             self.discrete_actions = discrete_actions[actions]
         elif setting["actions_space"] == "Big":
             self.discrete_actions = discrete_actions
-        log.warn("Action space: {}".format(self.discrete_actions))
+        log.warn("Action space: \n{}".format(self.discrete_actions))
 
         self.continous_actions     = setting['continous_actions']
         self.scale                 = setting['scale']
@@ -224,9 +224,12 @@ class UnrealCvLanding_base(gym.Env):
         # triggering causing resets seems to prevent exploration
         # If triggered the agent believes that the episode should be DONE
         if info['Trigger'] > self.trigger_th:
+            log.warn("TRIGGER = {} n. {}".format(info["Trigger"], self.trigger_count))
             self.trigger_count += 1
-            if self.trigger_count >= 3:
-                info['Reward']+= -500
+            info['Reward'] += -5
+            if self.trigger_count >= 5:
+                log.warn("TRIGGER activated")
+                info['Reward']+= -10
                 info['Done']   = True
 
         # obtain nearest point and its features
