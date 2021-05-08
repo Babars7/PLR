@@ -50,9 +50,9 @@ class UnrealCvLanding_base(gym.Env):
         self.success_th            = setting['success_th']
         self.target_object         = setting['target_object']
 
-        discrete_actions      = setting['discrete_actions']
+        discrete_actions      = np.asarray(setting['discrete_actions'])
         if setting["action_space"] == "Small":
-            actions = [0,1,2,3,4,5,6]
+            actions = [[0],[1],[2],[3],[4],[5],[6]]
             self.discrete_actions = discrete_actions[actions]
         elif setting["actions_space"] == "Big":
             self.discrete_actions = discrete_actions
