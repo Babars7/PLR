@@ -22,7 +22,7 @@ lr               = 3e-4
 num_steps        = 20
 mini_batch_size  = 5
 ppo_epochs       = 4
-max_frames       = 1500
+max_frames       = 80
 threshold_reward = -200
 
 '''---------------------------------------------------------------'''
@@ -334,8 +334,9 @@ log.warn("Training completed.")
 
 '''------------------- Testing the policy after training --------------------'''
 # Testing parameters
-num_tests = 1
-episodes_per_test = 50
+num_tests = 5
+episodes_per_test = [10,20,30,40,50]
+tot_successful_episodes = 0
 successful_episodes = 0
 
 log.warn("Setting model to eval, setup for testing.")
@@ -344,10 +345,9 @@ agent.model.eval()
 with torch.no_grad():
     for test in range(num_tests):
         episode_count = 0
-        num_test_episodes = episodes_per_test
+        num_test_episodes = episodes_per_test[test]
 
         episodes = {}
-
         state = env.reset()
 
         while episode_count < num_test_episodes:
@@ -378,6 +378,8 @@ with torch.no_grad():
 
                 next_state, reward, done, info = env.step(action.cpu().numpy())
 
+                log.warn("Distance to mesh: {}".format(info['Mesh_dists']))
+
                 # poses.append(info['Pose'])
                 dists.append(dist)
                 values.append(value.cpu().numpy())
@@ -390,6 +392,7 @@ with torch.no_grad():
                 if done:
                     if info['Success']:
                         successful_episodes += 1
+                        tot_successful_episodes += 1
                     traj = info['Trajectory']
                     state = env.reset()
                     episode_count += 1
@@ -411,13 +414,16 @@ with torch.no_grad():
 
             log.warn("Successes out of {}: {}".format(episode_count, successful_episodes))
 
-        filename = time.strftime("%Y%m%d_%H%M%S") + '{}'.format(test)
-        log.warn("Successes out of {}: {}".format(num_tests*episodes_per_test, successful_episodes))
+        filename = time.strftime("%Y%m%d_%H%M%S") + '{}' +'_'+'{}'+'-'+'{}'.format(test,num_test_episodes, successful_episodes)
+        log.warn("Successes out of {}: {}".format(num_test_episodes, successful_episodes))
         log.warn("About to save the test data.")
         file = save_obj(episodes, filename)
         del episodes
-        log.warn("Successes out of {}: {}".format(num_tests*episodes_per_test, successful_episodes))
+        log.warn("Successes out of {}: {}".format(num_test_episodes, successful_episodes))
         # print(load_obj(file))
+        successful_episodes = 0
+
+log.warn("Total Successes out of {}: {}".format(num_tests*30, tot_successful_episodes))
 
 log.warn("Done Testing.")
 
