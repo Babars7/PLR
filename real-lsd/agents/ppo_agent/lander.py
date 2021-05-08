@@ -22,7 +22,7 @@ lr               = 3e-4
 num_steps        = 20
 mini_batch_size  = 5
 ppo_epochs       = 4
-max_frames       = 80
+max_frames       = 15000
 threshold_reward = -200
 
 '''---------------------------------------------------------------'''
@@ -100,7 +100,8 @@ log.setLevel("WARN")
 
 # Copy settings file to data folder
 abs_path = os.path.dirname(real_lsd.__file__) + '/envs/settings/landing/gorner.json'
-cp_path  = '/home/nicloi/plr_project/PLR/data/json/gorner' #'/home/plr/PLR/data/json' # '/home/nicloi/plr_project/data'
+train_timestamp = time.strftime("%Y%m%d_%H%M%S")
+cp_path  = '/home/nicloi/plr_project/PLR/data/json/' + train_timestamp + '_gorner.json' #'/home/plr/PLR/data/json' # '/home/nicloi/plr_project/data'
 list_files = subprocess.run(["cp", abs_path, cp_path])
 log.warn("The exit code was: %d" % list_files.returncode)
 
@@ -168,7 +169,6 @@ state = env.reset()
 # Training loop
 while frame_idx < max_frames and not early_stop:
     log.warn("\n\n\n")
-    log.warn("Frame: {}".format(frame_idx))
     log.warn("Frame: {}\n\n\n".format(frame_idx))
     log_probs = []
     values    = []
@@ -317,7 +317,7 @@ while frame_idx < max_frames and not early_stop:
 training_data['test_rewards'] = test_rewards
 training_data['test_mean_rewards'] = test_mean_rewards
 training_data['values_at_beginning'] = values_at_beginning
-_ = save_obj(training_data, 'training_data')
+_ = save_obj(training_data, train_timestamp + 'training_data')
 
 # Delete training data once data is saved! Free up Memory
 del training_data
@@ -334,13 +334,15 @@ log.warn("Training completed.")
 
 '''------------------- Testing the policy after training --------------------'''
 # Testing parameters
-num_tests = 5
-episodes_per_test = [10,20,30,40,50]
+num_tests = 4
+episodes_per_test = [20,30,40,50]
 tot_successful_episodes = 0
 successful_episodes = 0
 
 log.warn("Setting model to eval, setup for testing.")
 agent.model.eval()
+
+test_timestamp = time.strftime("%Y%m%d_%H%M%S")
 
 with torch.no_grad():
     for test in range(num_tests):
@@ -378,6 +380,7 @@ with torch.no_grad():
 
                 next_state, reward, done, info = env.step(action.cpu().numpy())
 
+                log.warn("Step REWARD: {} DONE: {}".format(reward, done))
                 log.warn("Distance to mesh: {}".format(info['Mesh_dists']))
 
                 # poses.append(info['Pose'])
@@ -414,16 +417,15 @@ with torch.no_grad():
 
             log.warn("Successes out of {}: {}".format(episode_count, successful_episodes))
 
-        filename = time.strftime("%Y%m%d_%H%M%S") + '{}' +'_'+'{}'+'-'+'{}'.format(test,num_test_episodes, successful_episodes)
+        filename = test_timestamp + '{}'.format(test) +'_'+'{}'.format(num_test_episodes)+'-'+'{}'.format(successful_episodes)
         log.warn("Successes out of {}: {}".format(num_test_episodes, successful_episodes))
         log.warn("About to save the test data.")
         file = save_obj(episodes, filename)
         del episodes
-        log.warn("Successes out of {}: {}".format(num_test_episodes, successful_episodes))
         # print(load_obj(file))
         successful_episodes = 0
 
-log.warn("Total Successes out of {}: {}".format(num_tests*30, tot_successful_episodes))
+log.warn("Total Successes out of {}: {}".format(episodes_per_test.sum(), tot_successful_episodes))
 
 log.warn("Done Testing.")
 

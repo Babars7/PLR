@@ -49,7 +49,15 @@ class UnrealCvLanding_base(gym.Env):
         self.done_th               = setting['done_th']
         self.success_th            = setting['success_th']
         self.target_object         = setting['target_object']
-        self.discrete_actions      = setting['discrete_actions']
+
+        discrete_actions      = setting['discrete_actions']
+        if setting["action_space"] == "Small":
+            actions = [[0],[1],[2],[3],[4],[5],[6]]
+            self.discrete_actions = discrete_actions[actions]
+        elif setting["actions_space"] == "Big":
+            self.discrete_actions = discrete_actions
+        log.warn("Action space: {}".format(self.discrete_actions))
+
         self.continous_actions     = setting['continous_actions']
         self.scale                 = setting['scale']
         self.stretch               = setting['stretch']
@@ -58,7 +66,16 @@ class UnrealCvLanding_base(gym.Env):
         self.slope                 = points_list[:,3]
         self.roughness             = points_list[:,4]
         self.landable              = points_list[:,5] #added Valentin
-        log.warn("Points in the mesh: {}".format(self.points.shape))
+        log.warn("Points in the mesh: {}".format(self.points.shape[0]))
+
+        n_land_points = 0
+        for i in self.landable:
+            if i:
+                n_land_points += 1
+        
+        log.warn("Landable points in the mesh: {}  ({}%)".format(n_land_points, 100*n_land_points/self.points.shape[0]))
+
+
         log.warn("Stepscale: {}".format(self.stepscale))
         
 
@@ -234,13 +251,14 @@ class UnrealCvLanding_base(gym.Env):
             #mask           = self.unrealcv.get_mask(object_mask, self.target_object)
 
             # TODO: CHANGE reward function here
-            rew, done, suc, mesh_dist = self.reward_function.reward_mask_height(info['Pose'], error, mesh_height, 
+            rew, done, suc, mesh_dist, out_of_boundaries = self.reward_function.reward_mask_height(info['Pose'], error, mesh_height, 
                                                                     slope, roughness, landable, dist_landable,
                                                                     self.scale, self.stretch,
                                                                     self.done_th, self.success_th)
             info['Success'] = suc
             info['Reward'] += rew
             info['Mesh_dists'] = mesh_dist
+            info["Out_of_boundaries"] = out_of_boundaries
 
             if info['Collision'] and not info['Success']:
                 log.warn("COLLISION")
@@ -264,7 +282,7 @@ class UnrealCvLanding_base(gym.Env):
 
     def _reset(self, ):
         # double check the resetpoint, it is necessary for random reset type
-        log.info("Reset called.")
+        log.warn("RESET CALLED")
         collision = True
         while collision:
             current_pose = self.reset_module.select_resetpoint()

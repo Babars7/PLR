@@ -263,7 +263,7 @@ class Landing(UnrealCv):
     # IN: cam_id, delta_x, delta_y, delta_z
     # OUT:move agent to correct location, returns boolean for collision
     def move_3d(self, cam_id, delta_x, delta_y, delta_z):
-        log.warn("Executing move_3d for cam_id {}".format(cam_id))
+        #log.warn("Executing move_3d for cam_id {}".format(cam_id))
         location_now = None
         rotation_now = None
         location_exp = None
@@ -271,10 +271,11 @@ class Landing(UnrealCv):
         pose = self.get_pose(cam_id)
         location_now = self.cam[cam_id]['location']
         rotation_now = self.cam[cam_id]['rotation']
-        log.warn("Current location: {}, Current rotation: {}".format(location_now, rotation_now))
+        log.warn("Current location: {}".format(location_now))
+        #log.warn("Current location: {}, Current rotation: {}".format(location_now, rotation_now))
 
         # define new desired location
-        log.warn("Passed Deltas: {}, {}, {}".format(delta_x, delta_y, delta_z))
+        #log.warn("Passed Deltas: {}, {}, {}".format(delta_x, delta_y, delta_z))
         new_x = location_now[0] + delta_x
         new_y = location_now[1] + delta_y
         new_z = location_now[2] + delta_z
@@ -282,7 +283,7 @@ class Landing(UnrealCv):
         log.info("new_y: {}".format(new_y))
         log.info("new_z: {}".format(new_z))
         location_exp = [new_x, new_y, new_z]
-        log.warn("Expecting to move to this location: {}".format(location_exp))
+        #log.warn("Expecting to move to this location: {}".format(location_exp))
 
         while self.lock:
             log.info("waiting for lock to open.")
@@ -306,10 +307,10 @@ class Landing(UnrealCv):
         pose = self.get_pose(cam_id)
         location_now = self.cam[cam_id]['location']
         rotation_now = self.cam[cam_id]['rotation']
-        log.warn("moved to location: {}, rotated to rotation: {}".format(location_now, rotation_now))
+        #log.warn("moved to location: {}, rotated to rotation: {}".format(location_now, rotation_now))
 
         error = self.get_distance(location_now, location_exp, n=3)
-        log.warn("Error: {}".format(error))
+        #log.warn("Error: {}".format(error))
 
         if error < 10: # weird offset
             return False

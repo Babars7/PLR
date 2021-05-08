@@ -66,6 +66,7 @@ class Reward():
                            stretch_two=2): #scale 300, stretch 3000
         done    = False
         success = False
+        out_of_boundaries = False
         reward  = 0
         #reward_fov, mask_score = self.reward_mask(pose, slope, roughness, factor, right_shift_one, right_shift_two, stretch_one, stretch_two)
         reward_height, distance = self.reward_height(mesh_height, pose, scale, stretch)
@@ -78,6 +79,7 @@ class Reward():
             done = True
             reward -= 100
             log.warn("OUT OF BOUNDARIES")
+            out_of_boundaries = True
         else:
             if distance < done_thr:
                 done = True
@@ -95,7 +97,7 @@ class Reward():
             #reward += 10
 
         #log.warn("Reward Total: {}".format(reward))
-        return reward, done, success, distance
+        return reward, done, success, distance, out_of_boundaries
 
     def reward_sinc(self, mask, pose, done_thr, success_thr,
                         normalization_factor=3000,
