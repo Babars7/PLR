@@ -318,7 +318,7 @@ while frame_idx < max_frames and not early_stop:
 training_data['test_rewards'] = test_rewards
 training_data['test_mean_rewards'] = test_mean_rewards
 training_data['values_at_beginning'] = values_at_beginning
-_ = save_obj(training_data, train_timestamp + 'training_data')
+_ = save_obj(training_data, train_timestamp + '_training_data')
 
 # Delete training data once data is saved! Free up Memory
 del training_data
@@ -335,8 +335,8 @@ log.warn("Training completed.")
 
 '''------------------- Testing the policy after training --------------------'''
 # Testing parameters
-num_tests = 4
-episodes_per_test = [20,30,40,50]
+num_tests = 5
+episodes_per_test = np.array([10,20,30,40,50])
 tot_successful_episodes = 0
 successful_episodes = 0
 
@@ -418,7 +418,7 @@ with torch.no_grad():
 
             log.warn("Successes out of {}: {}".format(episode_count, successful_episodes))
 
-        filename = test_timestamp + '{}'.format(test) +'_'+'{}'.format(num_test_episodes)+'-'+'{}'.format(successful_episodes)
+        filename = test_timestamp + str(test) +'_'+ str(num_test_episodes)+'-' +str(successful_episodes)
         log.warn("Successes out of {}: {}".format(num_test_episodes, successful_episodes))
         log.warn("About to save the test data.")
         file = save_obj(episodes, filename)

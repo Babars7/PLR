@@ -224,12 +224,12 @@ class UnrealCvLanding_base(gym.Env):
         # triggering causing resets seems to prevent exploration
         # If triggered the agent believes that the episode should be DONE
         if info['Trigger'] > self.trigger_th:
-            log.warn("TRIGGER = {} n. {}".format(info["Trigger"], self.trigger_count))
+            log.warn("TRIGGER n. {}".format(self.trigger_count))
             self.trigger_count += 1
-            info['Reward'] += -5
-            if self.trigger_count >= 5:
+            info['Reward'] += -50
+            if self.trigger_count >= 3:
                 log.warn("TRIGGER activated")
-                info['Reward']+= -5
+                info['Reward'] += -30
                 info['Done']   = True
 
         # obtain nearest point and its features

@@ -111,7 +111,7 @@ class PPOAgent():
     def save_model(self):
         import time
         # PATH     = os.getcwd()
-        PATH     = '/media/scratch1/nasib'
+        PATH     = '/media/scratch2/plr_project/PLR'
         dir      = 'models'
         filename = time.strftime("%Y%m%d_%H%M%S")
         if dir not in os.listdir(PATH):
