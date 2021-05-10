@@ -52,7 +52,7 @@ class UnrealCvLanding_base(gym.Env):
 
         discrete_actions      = np.asarray(setting['discrete_actions'])
         if setting["action_space"] == "Small":
-            actions = [0,1,2,3,4,5,6]
+            actions = [1,2,3,4,5,6]
             self.discrete_actions = discrete_actions[actions]
         elif setting["actions_space"] == "Big":
             self.discrete_actions = discrete_actions
@@ -187,7 +187,7 @@ class UnrealCvLanding_base(gym.Env):
         self.count_steps  += 1
 
         # Time Penalty
-        info['Reward']    += -0.1*self.count_steps  # -10
+        #info['Reward']    += -0.1*self.count_steps  # -10
 
         self.unrealcv.set_step(self.count_steps)
         self.unrealcv.set_velocity(velocity)
@@ -265,12 +265,12 @@ class UnrealCvLanding_base(gym.Env):
 
             if info['Collision'] and not info['Success']:
                 log.warn("COLLISION")
-                info['Reward'] += -50
+                info['Reward'] += -1
                 info['Done']   = True
 
             if self.count_steps >= self.maxsteps and not info['Success']:
                 log.warn("MAX STEPS EXCEEDED")
-                info['Reward'] += -50
+                info['Reward'] += -1
                 info['Done']   = True
 
             if not info['Done']:
