@@ -8,7 +8,8 @@ import pickle
 import numpy as np
 import glog as log
 import subprocess
-
+import matplotlib as plt
+from mpl_toolkits.mplot3d import Axes3D
 import gym_unrealcv
 import real_lsd
 
@@ -68,13 +69,30 @@ def get_activation(name):
         activation[name] = output.detach()
     return hook
 
-# def plot(frame_idx, rewards):
-#     clear_output(True)
-#     plt.figure(figsize=(20,5))
-#     plt.subplot(131)
-#     plt.title('frame %s. reward: %s' % (frame_idx, rewards[-1]))
-#     plt.plot(rewards)
-#     plt.show()
+def plot(frame_idx, rewards):
+     clear_output(True)
+     plt.figure(figsize=(20,5))
+     plt.subplot(131)
+     plt.title('frame %s. reward: %s' % (frame_idx, rewards[-1]))
+     plt.plot(rewards)
+     plt.savefig('test_rewards{}.png').format(frame_idx)
+     #plt.show()
+
+def plot_trajectory(poses, test):
+    plt.figure(figsize=(20,5))
+    plt.subplot(111, projection='3d')
+    x = poses[:,0]
+    y = poses[:,1]
+    z = poses[:,1]
+    plt.title('Trajectory')
+    plt.plot_wireframe(x, y, z)
+    plt.savefig('test_rewards{}.png').format(test)
+
+
+
+
+
+
 
 def test_env():
     state = env.reset()
@@ -215,7 +233,7 @@ while frame_idx < max_frames and not early_stop:
         next_state, reward, done, info = env.step(action.cpu().numpy())
         log.warn("Step REWARD: {} DONE: {}".format(reward, done))
 
-        log.warn("Distance to mesh: {}".format(info['Mesh_dists']))
+        #log.warn("Distance to mesh: {}".format(info['Mesh_dists']))
 
         log_prob = dist.log_prob(action)
         log.info("Step LOG_PROB: {}".format(log_prob))
@@ -263,7 +281,7 @@ while frame_idx < max_frames and not early_stop:
 
             test_mean_rewards.append(test_mean_reward)
             test_rewards.append(test_reward)
-            # plot(frame_idx, test_rewards)
+            plot(frame_idx, test_rewards)
             # if test_reward > threshold_reward: early_stop = True
 
         # next state logic
@@ -358,7 +376,7 @@ with torch.no_grad():
             done = False
             episode = {}
 
-            # poses     = [start_pose]
+            poses     = []
             states    = [state]
             dists     = []
             values    = []
@@ -373,7 +391,7 @@ with torch.no_grad():
                 states.append(state)
 
                 state = torch.FloatTensor(state).to(device)
-                dist, value = agent.model(state)
+                dist, value = agent.model(state)  
 
                 action = dist.sample()
                 log.info("action type: {}".format(action))
@@ -382,9 +400,10 @@ with torch.no_grad():
                 next_state, reward, done, info = env.step(action.cpu().numpy())
 
                 log.warn("Step REWARD: {} DONE: {}".format(reward, done))
-                log.warn("Distance to mesh: {}".format(info['Mesh_dists']))
+                #log.warn("Distance to mesh: {}".format(info['Mesh_dists']))
 
-                # poses.append(info['Pose'])
+                #poses.append(info['Pose'])
+                poses = np.concatenate((poses,info['Pose'].np), axis=1)
                 dists.append(dist)
                 values.append(value.cpu().numpy())
                 actions.append(action.cpu().numpy())
@@ -404,7 +423,7 @@ with torch.no_grad():
                 else:
                     state = next_state
 
-            # episode['poses']    = poses
+            #episode['poses']    = poses
             episode['states']   = states
             episode['dists']    = dists
             episode['values']   = values
@@ -418,7 +437,7 @@ with torch.no_grad():
             episodes[key] = episode
 
             log.warn("Successes out of {}: {}".format(episode_count, successful_episodes))
-
+        plot_trajectory(poses, test)
         filename = test_timestamp + str(test) +'_'+ str(num_test_episodes)+'-' +str(successful_episodes)
         log.warn("Successes out of {}: {}".format(num_test_episodes, successful_episodes))
         log.warn("About to save the test data.")
@@ -426,6 +445,7 @@ with torch.no_grad():
         del episodes
         # print(load_obj(file))
         successful_episodes = 0
+
 
 log.warn("Total Successes out of {}: {}".format(episodes_per_test.sum(), tot_successful_episodes))
 

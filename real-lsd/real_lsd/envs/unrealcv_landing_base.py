@@ -56,7 +56,7 @@ class UnrealCvLanding_base(gym.Env):
             self.discrete_actions = discrete_actions[actions]
         elif setting["actions_space"] == "Big":
             self.discrete_actions = discrete_actions
-        log.warn("Action space: \n{}".format(self.discrete_actions))
+        #log.warn("Action space: \n{}".format(self.discrete_actions))
 
         self.continous_actions     = setting['continous_actions']
         self.scale                 = setting['scale']
@@ -66,7 +66,7 @@ class UnrealCvLanding_base(gym.Env):
         self.slope                 = points_list[:,3]
         self.roughness             = points_list[:,4]
         self.landable              = points_list[:,5] #added Valentin
-        log.warn("Points in the mesh: {}".format(self.points.shape[0]))
+        #log.warn("Points in the mesh: {}".format(self.points.shape[0]))
 
         n_land_points = 0
         for i in self.landable:
@@ -189,7 +189,8 @@ class UnrealCvLanding_base(gym.Env):
         self.count_steps  += 1
 
         # Time Penalty
-        #info['Reward']    += -0.1*self.count_steps  # -10
+        info['Reward']    += -0.005
+        #*self.count_steps  # -10
 
         self.unrealcv.set_step(self.count_steps)
         self.unrealcv.set_velocity(velocity)
@@ -267,17 +268,17 @@ class UnrealCvLanding_base(gym.Env):
 
             if info['Collision'] and not info['Success']:
                 log.warn("COLLISION")
-                info['Reward'] += -1
+                info['Reward'] += -10
                 info['Done']   = True
 
             if info["Out_of_boundaries"] and not info['Success']:
                 log.warn("OUT OF BOUNDARIES")
-                info['Reward'] += -1
+                info['Reward'] += -10
                 info['Done']   = True
 
             if self.count_steps >= self.maxsteps and not info['Success']:
                 log.warn("MAX STEPS EXCEEDED")
-                info['Reward'] += -1
+                info['Reward'] += -10
                 info['Done']   = True
                 info['Max Step'] = True
 

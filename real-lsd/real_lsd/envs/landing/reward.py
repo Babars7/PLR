@@ -79,17 +79,17 @@ class Reward():
             done = True
             out_of_boundaries = True
         else:
-            if distance < done_thr:
+            if distance < 5*done_thr: #mo
                 done = True
                 
                 #here slope, roughness reward
                 if landable == 1:
-                    reward += 1
+                    reward += 10
                     log.warn("SUCCESS landed correctly")
                     success = True
                 else:
                     log.warn("FAILED landed incorrectly")
-                    reward -= 1
+                    reward -= 10+
 
             #if dist_landable < 100: #100 is like threshold that can be modified
             #reward += 10

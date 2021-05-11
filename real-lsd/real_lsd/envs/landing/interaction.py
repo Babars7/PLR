@@ -112,7 +112,7 @@ class Landing(UnrealCv):
             log.warn("step is: {} with dimension: {}".format(step, step.shape))
 
             vel = self.get_velocity()
-            log.warn("Velocit is: {} {} {}".format(vel[0], vel[1], vel[2]))
+            log.info("Velocit is: {} {} {}".format(vel[0], vel[1], vel[2]))
 
             self.features = self.get_features(cam_id, 'lit')
             log.info("Features are dimension: {}".format(self.features.shape))
