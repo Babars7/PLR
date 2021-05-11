@@ -75,10 +75,8 @@ class Reward():
         reward = reward_height #+ reward_distance #+ reward_FOV
 
         # Adding a step reward readded
-        if error > 5 * self.stepscale:
+        if error > 3 * self.stepscale:
             done = True
-            reward -= 1
-            log.warn("OUT OF BOUNDARIES")
             out_of_boundaries = True
         else:
             if distance < done_thr:

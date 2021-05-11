@@ -269,7 +269,7 @@ while frame_idx < max_frames and not early_stop:
         # next state logic
         if done:
             episode_count += 1
-            print(info)
+            log.warn(info)
             log.warn("Resetting")          
             state = env.reset()
         else:
@@ -398,6 +398,7 @@ with torch.no_grad():
                         successful_episodes += 1
                         tot_successful_episodes += 1
                     traj = info['Trajectory']
+                    log.warn(info)
                     state = env.reset()
                     episode_count += 1
                 else:

@@ -169,6 +169,8 @@ class UnrealCvLanding_base(gym.Env):
         delta_y = 0
         delta_z = 0
         info['Trigger'] = 0
+        info["Out_of_boundaries"] = False
+        info['Max Step'] = False
 
         action          = np.squeeze(action)
 
@@ -268,10 +270,16 @@ class UnrealCvLanding_base(gym.Env):
                 info['Reward'] += -1
                 info['Done']   = True
 
+            if info["Out_of_boundaries"] and not info['Success']:
+                log.warn("OUT OF BOUNDARIES")
+                info['Reward'] += -1
+                info['Done']   = True
+
             if self.count_steps >= self.maxsteps and not info['Success']:
                 log.warn("MAX STEPS EXCEEDED")
                 info['Reward'] += -1
                 info['Done']   = True
+                info['Max Step'] = True
 
             if not info['Done']:
                 info['Done']= done
