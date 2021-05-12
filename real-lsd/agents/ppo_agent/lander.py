@@ -233,7 +233,7 @@ while frame_idx < max_frames and not early_stop:
         next_state, reward, done, info = env.step(action.cpu().numpy())
         log.warn("Step REWARD: {} DONE: {}".format(reward, done))
 
-        #log.warn("Distance to mesh: {}".format(info['Mesh_dists']))
+        log.warn("Distance to mesh: {}".format(info['Mesh_dists']))
 
         log_prob = dist.log_prob(action)
         log.info("Step LOG_PROB: {}".format(log_prob))
@@ -400,7 +400,7 @@ with torch.no_grad():
                 next_state, reward, done, info = env.step(action.cpu().numpy())
 
                 log.warn("Step REWARD: {} DONE: {}".format(reward, done))
-                #log.warn("Distance to mesh: {}".format(info['Mesh_dists']))
+                log.warn("Distance to mesh: {}".format(info['Mesh_dists']))
 
                 #poses.append(info['Pose'])
                 poses = np.concatenate((poses,info['Pose'].np), axis=1)

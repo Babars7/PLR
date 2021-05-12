@@ -53,7 +53,10 @@ class Reward():
         return reward, distance
 
     def reward_distance(self, dis2target_now):
-        reward = 10*(self.dis2target_last - dis2target_now) / max(self.dis2target_last/10, 200)
+        if (self.dis2target_last - dis2target_now)<300 and (self.dis2target_last - dis2target_now)>100:
+            reward = (1/2000000)*(self.dis2target_last - dis2target_now) * max(self.dis2target_last/100, 40)
+        else:
+            reward = 0
         self.dis2target_last = dis2target_now
         #log.warn("Reward Distance: {}".format(reward))
         return reward
@@ -72,7 +75,7 @@ class Reward():
         reward_height, distance = self.reward_height(mesh_height, pose, scale, stretch)
         reward_distance = self.reward_distance(distance)
 
-        reward = reward_height #+ reward_distance #+ reward_FOV
+        reward = reward_height + reward_distance #+ reward_FOV
 
         # Adding a step reward readded
         if error > 3 * self.stepscale:
@@ -84,12 +87,12 @@ class Reward():
                 
                 #here slope, roughness reward
                 if landable == 1:
-                    reward += 10
+                    reward += 1
                     log.warn("SUCCESS landed correctly")
                     success = True
                 else:
                     log.warn("FAILED landed incorrectly")
-                    reward -= 10
+                    reward -= 1
 
             #if dist_landable < 100: #100 is like threshold that can be modified
             #reward += 10
