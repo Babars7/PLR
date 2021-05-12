@@ -89,7 +89,7 @@ class Reward():
                     success = True
                 else:
                     log.warn("FAILED landed incorrectly")
-                    reward -= 10+
+                    reward -= 10
 
             #if dist_landable < 100: #100 is like threshold that can be modified
             #reward += 10
