@@ -51,11 +51,11 @@ class UnrealCvLanding_base(gym.Env):
         self.target_object         = setting['target_object']
 
         discrete_actions      = np.asarray(setting['discrete_actions'])
-        if setting["action_space"] == "Small":
-            actions = [1,2,3,4,5,6]
-            self.discrete_actions = discrete_actions[actions]
-        elif setting["actions_space"] == "Big":
-            self.discrete_actions = discrete_actions
+        #if setting["action_space"] == "Small":
+        #    actions = [1,2,3,4,5,6]
+        #    self.discrete_actions = discrete_actions[actions]
+        #elif setting["actions_space"] == "Big":
+        #    self.discrete_actions = discrete_actions
         #log.warn("Action space: \n{}".format(self.discrete_actions))
 
         self.continous_actions     = setting['continous_actions']
@@ -102,7 +102,7 @@ class UnrealCvLanding_base(gym.Env):
 
         assert self.action_type == 'Discrete' or self.action_type == 'Continuous'
         if self.action_type == 'Discrete':
-            self.action_space      = spaces.Discrete(len(self.discrete_actions))
+            self.action_space      = spaces.Discrete(len(self.discrete_actions))[1,2,3,4,5,6]
         elif self.action_type == 'Continuous':
             self.action_space      = spaces.Box(low=np.array(self.continous_actions['low']),
                                                 high=np.array(self.continous_actions['high']))
